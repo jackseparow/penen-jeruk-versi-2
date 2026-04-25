@@ -15,41 +15,47 @@
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
+        html, body { 
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            width: 100%;
+        }
+
         body { 
             font-family: 'Segoe UI', Tahoma, sans-serif; 
             background: #fdfaf5; 
             display: flex; 
             flex-direction: column; 
             align-items: center; 
-            padding: 10px; 
-            margin: 0; 
-            min-height: 100vh;
             overflow-x: hidden;
+            padding: 10px;
         }
         
-        #header-container { width: 100%; max-width: 1200px; text-align: center; margin-bottom: 5px; }
-        .logo-numerasi { height: 50px; width: auto; }
+        #header-container { width: 100%; max-width: 1200px; text-align: center; margin-bottom: 5px; flex-shrink: 0; }
+        .logo-numerasi { height: 45px; width: auto; }
 
         #title-container { 
-            display: flex; align-items: center; gap: 15px; margin-bottom: 10px; 
-            background: white; padding: 12px 20px; border-radius: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); 
-            width: 98%; max-width: 1200px;
+            display: flex; align-items: center; gap: 12px; margin-bottom: 10px; 
+            background: white; padding: 10px 15px; border-radius: 15px; 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05); 
+            width: 98%; max-width: 1200px; flex-shrink: 0;
         }
-        .maskot { height: 60px; width: auto; }
+        .maskot { height: 50px; width: auto; }
         .title-text { flex: 1; }
-        h2 { margin: 0; color: var(--primary-green); font-size: 1.2em; }
-        .instruction-box { margin-top: 3px; color: #555; font-size: 0.85em; border-left: 4px solid #ff9f1c; padding-left: 10px; }
+        h2 { margin: 0; color: var(--primary-green); font-size: 1.1em; }
+        .instruction-box { margin-top: 3px; color: #555; font-size: 0.8em; border-left: 4px solid #ff9f1c; padding-left: 10px; }
 
         #main-wrapper { 
             display: flex; flex-direction: row; gap: 15px; width: 98%; max-width: 1200px; 
-            min-height: 500px;
+            flex: 1; min-height: 0;
         }
 
-        /* --- KANVAS GAME --- */
+        /* --- AREA GAME --- */
         #sim-container { 
-            flex: 1; position: relative; border: 4px solid #55a630; border-radius: 15px; 
+            flex: 2; position: relative; border: 4px solid #55a630; border-radius: 15px; 
             background: var(--sky-blue); overflow: hidden; touch-action: none;
-            height: 70vh; min-height: 400px;
+            min-height: 350px;
         }
         #orchard-bg { 
             position: absolute; width: 100%; height: 100%; 
@@ -58,7 +64,7 @@
         }
         #orange-container { position: absolute; width: 100%; height: 100%; z-index: 10; pointer-events: none; }
         
-        /* 1. Ukuran jeruk 75% (sekitar 34px dari standar 45px awal) */
+        /* Jeruk 75% */
         .orange { 
             position: absolute; width: 34px; height: 34px; 
             background: url('orange-fruit.png') center/contain no-repeat;
@@ -66,61 +72,66 @@
         }
 
         #btn-reset-canvas { 
-            position: absolute; top: 15px; left: 15px; z-index: 100;
+            position: absolute; top: 10px; left: 10px; z-index: 100;
             background: #e74c3c; color: white; border: 2px solid white; 
-            padding: 8px 15px; border-radius: 10px; cursor: pointer; font-weight: bold; font-size: 0.8em;
+            padding: 8px 12px; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 0.75em;
         }
 
         #canvas-counter {
-            position: absolute; top: 15px; right: 15px; z-index: 100;
-            background: rgba(255, 255, 255, 0.9); padding: 8px 15px; 
-            border-radius: 12px; border: 2px solid var(--accent-orange);
+            position: absolute; top: 10px; right: 10px; z-index: 100;
+            background: rgba(255, 255, 255, 0.9); padding: 5px 12px; 
+            border-radius: 10px; border: 2px solid var(--accent-orange);
             text-align: center;
         }
-        #sum-actual { font-size: 1.8em; color: var(--accent-orange); font-weight: bold; display: block; line-height: 1; }
+        #sum-actual { font-size: 1.5em; color: var(--accent-orange); font-weight: bold; display: block; line-height: 1; }
 
         #active-basket { 
-            position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); 
-            width: 130px; height: 80px; background: var(--trunk-brown); border: 3px solid #3e2723; 
-            border-radius: 0 0 50px 50px; z-index: 100; cursor: grab; 
-            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+            position: absolute; bottom: 15px; left: 50%; transform: translateX(-50%); 
+            width: 120px; height: 70px; background: var(--trunk-brown); border: 3px solid #3e2723; 
+            border-radius: 0 0 45px 45px; z-index: 100; cursor: grab; 
+            box-shadow: 0 8px 15px rgba(0,0,0,0.2);
         }
-        #active-basket.full { border-color: #ff9f1c; box-shadow: 0 0 25px #ff9f1c; cursor: pointer; }
-        #basket-count { position: absolute; top: -35px; left: 50%; transform: translateX(-50%); background: #ff9f1c; color: white; padding: 3px 12px; border-radius: 8px; font-weight: bold; z-index: 110; }
+        #active-basket.full { border-color: #ff9f1c; box-shadow: 0 0 20px #ff9f1c; cursor: pointer; }
+        #basket-count { 
+            position: absolute; top: -32px; left: 50%; transform: translateX(-50%); 
+            background: #ff9f1c; color: white; padding: 2px 10px; border-radius: 6px; 
+            font-weight: bold; font-size: 0.85em; z-index: 110; white-space: nowrap;
+        }
 
         .pile-orange {
             position: absolute; width: 34px; height: 34px;
             background: url('orange-fruit.png') center/contain no-repeat;
-            pointer-events: none;
-            z-index: 105;
+            pointer-events: none; z-index: 105;
         }
 
-        /* --- GUDANG & LOGIKA --- */
-        #sidebar-right { width: 320px; display: flex; flex-direction: column; gap: 10px; }
+        /* --- SIDEBAR --- */
+        #sidebar-right { width: 300px; display: flex; flex-direction: column; gap: 10px; flex-shrink: 0; }
         #storage-area { 
-            background: white; border-radius: 12px; padding: 15px; border: 3px solid #55a630; 
-            display: flex; flex-direction: column; flex-grow: 1;
+            background: white; border-radius: 12px; padding: 12px; border: 3px solid #55a630; 
+            display: flex; flex-direction: column; height: 100%;
         }
         #storage-grid { 
-            min-height: 100px; border: 2px dashed #c5e1a5; border-radius: 8px; 
-            margin: 10px 0; display: flex; flex-wrap: wrap; gap: 8px; padding: 10px; 
-            background: #fafafa; overflow-y: auto;
+            flex: 1; border: 2px dashed #c5e1a5; border-radius: 8px; 
+            margin: 8px 0; display: flex; flex-wrap: wrap; gap: 6px; padding: 8px; 
+            background: #fafafa; overflow-y: auto; min-height: 100px;
         }
         .stored-basket { 
-            width: 45px; height: 35px; background: #ffecb3; border: 2px solid #ff9f1c; 
-            border-radius: 0 0 15px 15px; display: flex; align-items: center; justify-content: center; 
-            font-size: 0.7em; font-weight: bold; color: #e67e22; 
+            width: 40px; height: 32px; background: #ffecb3; border: 2px solid #ff9f1c; 
+            border-radius: 0 0 12px 12px; display: flex; align-items: center; justify-content: center; 
+            font-size: 0.65em; font-weight: bold; color: #e67e22; 
         }
 
-        #numeracy-logic { background: var(--soft-yellow); padding: 15px; border-radius: 12px; border: 2px solid #ff9f1c; }
-        .logic-row-h { display: flex; align-items: center; justify-content: space-between; margin-top: 10px; }
-        .logic-input { width: 60px; padding: 10px; border: 2px solid #ff9f1c; border-radius: 10px; text-align: center; font-size: 1.2em; font-weight: bold; }
-        #user-result { font-size: 2em; color: var(--accent-orange); font-weight: bold; border-bottom: 4px solid var(--accent-orange); min-width: 60px; text-align: center; }
+        #numeracy-logic { background: var(--soft-yellow); padding: 12px; border-radius: 10px; border: 2px solid #ff9f1c; }
+        .logic-row-h { display: flex; align-items: center; justify-content: space-around; margin-top: 8px; }
+        .logic-input { width: 55px; padding: 8px; border: 2px solid #ff9f1c; border-radius: 8px; text-align: center; font-size: 1.1em; font-weight: bold; }
+        #user-result { font-size: 1.8em; color: var(--accent-orange); font-weight: bold; border-bottom: 3px solid var(--accent-orange); min-width: 50px; text-align: center; }
 
+        /* RESPONSIVE */
         @media (max-width: 850px) {
-            #main-wrapper { flex-direction: column; min-height: auto; }
-            #sidebar-right { width: 100%; }
-            #sim-container { height: 50vh; }
+            #main-wrapper { flex-direction: column; flex: none; width: 100%; }
+            #sim-container { height: 55vh; flex: none; width: 100%; }
+            #sidebar-right { width: 100%; height: auto; }
+            body { overflow-y: auto; }
         }
     </style>
 </head>
@@ -142,34 +153,34 @@
         <div id="sim-container">
             <button id="btn-reset-canvas" onclick="initGame()">KEBUN BARU</button>
             <div id="canvas-counter">
-                <span style="font-size: 0.6em; font-weight: bold;">TOTAL PANEN</span>
+                <span style="font-size: 0.55em; font-weight: bold;">TOTAL PANEN</span>
                 <span id="sum-actual">0</span>
             </div>
             <div id="orchard-bg"></div>
             <div id="orange-container"></div>
             <div id="active-basket">
-                <div id="basket-orange-pile" style="position:relative; width:100%; height:100%; pointer-events:none;"></div>
+                <div id="basket-orange-pile" style="position:relative; width:100%; height:100%;"></div>
                 <span id="basket-count">0 / 10</span>
             </div>
         </div>
 
         <div id="sidebar-right">
             <div id="storage-area">
-                <b style="color: var(--primary-green);">🏠 Gudang Penyimpanan</b>
+                <b style="color: var(--primary-green); font-size: 0.9em;">🏠 Gudang Penyimpanan</b>
                 <div id="storage-grid"></div>
                 <div id="numeracy-logic">
-                    <span style="font-weight: bold; font-size: 0.85em; color: var(--primary-green);">Total di Gudang?</span>
+                    <span style="font-weight: bold; font-size: 0.8em; color: var(--primary-green);">Total di Gudang?</span>
                     <div class="logic-row-h">
                         <div style="display:flex; flex-direction:column; align-items:center;">
                             <input type="number" id="in-basket" class="logic-input" oninput="calculateUser()">
-                            <small>Keranjang</small>
+                            <small style="font-size: 0.6em;">Keranjang</small>
                         </div>
-                        <b>×</b>
+                        <b style="font-size: 0.9em;">×</b>
                         <div style="display:flex; flex-direction:column; align-items:center;">
                             <input type="number" id="in-capacity" class="logic-input" oninput="calculateUser()">
-                            <small>Isi</small>
+                            <small style="font-size: 0.6em;">Isi</small>
                         </div>
-                        <b>=</b>
+                        <b style="font-size: 0.9em;">=</b>
                         <span id="user-result">0</span>
                     </div>
                 </div>
@@ -198,6 +209,109 @@
             document.getElementById('user-result').innerText = '0';
             updateUI();
 
-            // 2. Jumlah jeruk random 80 - 170
+            // Random jumlah jeruk 80 - 170
             let spawned = 0;
-            const targetTotal = Math.floor(Math.random() * (170
+            const targetTotal = Math.floor(Math.random() * (170 - 80 + 1)) + 80; 
+
+            for(let i=0; i < 500; i++) { // Loop besar untuk memastikan target di area dahan terpenuhi
+                if (spawned >= targetTotal) break;
+
+                let x = 10 + Math.random() * 80; 
+                let y = 15 + Math.random() * 45; 
+                
+                let centerX = 50;
+                let centerY = 40;
+                let dist = Math.sqrt(Math.pow((x - centerX) / 45, 2) + Math.pow((y - centerY) / 30, 2));
+
+                if (dist < 1) { 
+                    const orange = document.createElement('div');
+                    orange.className = 'orange';
+                    orange.style.left = x + '%';
+                    orange.style.top = y + '%';
+                    orange.onclick = function(e) { 
+                        e.stopPropagation();
+                        pickOrange(this); 
+                    };
+                    orangeContainer.appendChild(orange);
+                    spawned++;
+                }
+            }
+        }
+
+        function pickOrange(el) {
+            if (currentInBasket >= maxCapacity) return;
+            const oRect = el.getBoundingClientRect();
+            const bRect = basket.getBoundingClientRect();
+            
+            const orangeMid = oRect.left + (oRect.width / 2);
+            const basketMid = bRect.left + (bRect.width / 2);
+
+            if (Math.abs(orangeMid - basketMid) < 75) {
+                el.style.transition = "top 0.4s ease-in, opacity 0.3s";
+                el.style.top = "85%";
+                el.style.opacity = "0";
+                setTimeout(() => {
+                    if(el.parentNode) el.remove();
+                    addOrangeToBasket();
+                    currentInBasket++;
+                    totalHarvestedActual++;
+                    updateUI();
+                }, 400);
+            }
+        }
+
+        function addOrangeToBasket() {
+            const p = document.createElement('div');
+            p.className = 'pile-orange';
+            // Menumpuk natural (Tetap ukuran 34px)
+            p.style.left = (Math.random() * 50 + 10) + "px"; 
+            p.style.bottom = (5 + Math.floor(currentInBasket/2) * 10) + "px";
+            p.style.transform = `rotate(${-15 + Math.random() * 30}deg)`;
+            orangePile.appendChild(p);
+        }
+
+        function moveBasket(clientX) {
+            const rect = simArea.getBoundingClientRect();
+            let x = clientX - rect.left - (basket.offsetWidth / 2);
+            if (x < 0) x = 0;
+            if (x > rect.width - basket.offsetWidth) x = rect.width - basket.offsetWidth;
+            basket.style.left = x + "px";
+            basket.style.transform = "none";
+        }
+
+        simArea.addEventListener('mousemove', (e) => { if(e.buttons === 1) moveBasket(e.clientX); });
+        simArea.addEventListener('touchstart', (e) => { moveBasket(e.touches[0].clientX); }, {passive: true});
+        simArea.addEventListener('touchmove', (e) => { 
+            e.preventDefault(); 
+            moveBasket(e.touches[0].clientX); 
+        }, {passive: false});
+
+        basket.onclick = () => {
+            if (currentInBasket === maxCapacity) {
+                const item = document.createElement('div');
+                item.className = 'stored-basket';
+                item.innerText = '🧺10';
+                document.getElementById('storage-grid').appendChild(item);
+                currentInBasket = 0;
+                orangePile.innerHTML = '';
+                updateUI();
+            }
+        };
+
+        function calculateUser() {
+            const b = parseInt(document.getElementById('in-basket').value) || 0;
+            const c = parseInt(document.getElementById('in-capacity').value) || 0;
+            document.getElementById('user-result').innerText = b * c;
+        }
+
+        function updateUI() {
+            document.getElementById('basket-count').innerText = `${currentInBasket} / 10`;
+            basket.classList.toggle('full', currentInBasket === maxCapacity);
+            document.getElementById('sum-actual').innerText = totalHarvestedActual;
+        }
+
+        // Memastikan game siap setelah semua aset muat
+        window.onload = initGame;
+    </script>
+</body>
+</html>

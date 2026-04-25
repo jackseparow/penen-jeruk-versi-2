@@ -209,9 +209,9 @@
             document.getElementById('user-result').innerText = '0';
             updateUI();
 
-            // Random jumlah jeruk 80 - 170
+            // Random jumlah jeruk 60 - 110
             let spawned = 0;
-            const targetTotal = Math.floor(Math.random() * (170 - 80 + 1)) + 80; 
+            const targetTotal = Math.floor(Math.random() * (110 - 60 + 1)) + 60; 
 
             for(let i=0; i < 500; i++) { // Loop besar untuk memastikan target di area dahan terpenuhi
                 if (spawned >= targetTotal) break;

@@ -58,7 +58,7 @@
         }
         #orange-container { position: absolute; width: 100%; height: 100%; z-index: 10; pointer-events: none; }
         
-        /* Jeruk ukuran 150% (68px) */
+        /* Jeruk dipanen ukuran besar (150% = 68px) */
         .orange { 
             position: absolute; width: 68px; height: 68px; 
             background: url('orange-fruit.png') center/contain no-repeat;
@@ -86,13 +86,14 @@
             box-shadow: 0 10px 20px rgba(0,0,0,0.3);
         }
         #active-basket.full { border-color: #ff9f1c; box-shadow: 0 0 25px #ff9f1c; cursor: pointer; }
-        #basket-count { position: absolute; top: -35px; left: 50%; transform: translateX(-50%); background: #ff9f1c; color: white; padding: 3px 12px; border-radius: 8px; font-weight: bold; }
+        #basket-count { position: absolute; top: -35px; left: 50%; transform: translateX(-50%); background: #ff9f1c; color: white; padding: 3px 12px; border-radius: 8px; font-weight: bold; z-index: 110; }
 
-        /* Jeruk di dalam keranjang tetap ukuran asli (68px) agar terlihat menumpuk natural */
+        /* Jeruk di dalam keranjang tetap ukuran 68px agar natural */
         .pile-orange {
             position: absolute; width: 68px; height: 68px;
             background: url('orange-fruit.png') center/contain no-repeat;
             pointer-events: none;
+            z-index: 105;
         }
 
         /* --- GUDANG & LOGIKA --- */
@@ -148,7 +149,7 @@
             <div id="orchard-bg"></div>
             <div id="orange-container"></div>
             <div id="active-basket">
-                <div id="basket-orange-pile"></div>
+                <div id="basket-orange-pile" style="position:relative; width:100%; height:100%; pointer-events:none;"></div>
                 <span id="basket-count">0 / 10</span>
             </div>
         </div>
@@ -199,8 +200,97 @@
             updateUI();
 
             let spawned = 0;
-            const targetTotal = 35; 
+            const targetTotal = 30; 
 
+            // Logika kemunculan yang diperbaiki: Pastikan jeruk ada di area dahan
             while (spawned < targetTotal) {
-                let x = 10 + Math.random() * 80; 
-                let
+                let x = 15 + Math.random() * 70; // 15% - 85% lebar
+                let y = 20 + Math.random() * 35; // 20% - 55% tinggi (Area daun)
+                
+                const orange = document.createElement('div');
+                orange.className = 'orange';
+                orange.style.left = x + '%';
+                orange.style.top = y + '%';
+                orange.onclick = function() { pickOrange(this); };
+                orangeContainer.appendChild(orange);
+                spawned++;
+            }
+        }
+
+        function pickOrange(el) {
+            if (currentInBasket >= maxCapacity) return;
+            const oRect = el.getBoundingClientRect();
+            const bRect = basket.getBoundingClientRect();
+            
+            const orangeMid = oRect.left + (oRect.width / 2);
+            const basketMid = bRect.left + (bRect.width / 2);
+
+            // Deteksi tabrakan horizontal
+            if (Math.abs(orangeMid - basketMid) < 80) {
+                el.style.transition = "top 0.4s ease-in, opacity 0.3s";
+                el.style.top = "85%";
+                el.style.opacity = "0";
+                setTimeout(() => {
+                    if(el.parentNode) el.remove();
+                    addOrangeToBasket();
+                    currentInBasket++;
+                    totalHarvestedActual++;
+                    updateUI();
+                }, 400);
+            }
+        }
+
+        function addOrangeToBasket() {
+            const p = document.createElement('div');
+            p.className = 'pile-orange';
+            // Menumpuk natural ke atas tanpa mengecil (tetap 68px)
+            // Offset X diatur agar di tengah keranjang, Y menumpuk ke atas
+            p.style.left = (Math.random() * 30 + 15) + "px"; 
+            p.style.bottom = (5 + Math.floor(currentInBasket/2) * 12) + "px";
+            p.style.transform = `rotate(${-15 + Math.random() * 30}deg)`;
+            orangePile.appendChild(p);
+        }
+
+        function moveBasket(clientX) {
+            const rect = simArea.getBoundingClientRect();
+            let x = clientX - rect.left - 65;
+            if (x < 5) x = 5;
+            if (x > rect.width - 135) x = rect.width - 135;
+            basket.style.left = x + "px";
+            basket.style.transform = "none";
+        }
+
+        simArea.addEventListener('mousemove', (e) => { if(e.buttons === 1) moveBasket(e.clientX); });
+        simArea.addEventListener('touchmove', (e) => { 
+            e.preventDefault(); 
+            moveBasket(e.touches[0].clientX); 
+        }, {passive: false});
+
+        basket.onclick = () => {
+            if (currentInBasket === maxCapacity) {
+                const item = document.createElement('div');
+                item.className = 'stored-basket';
+                item.innerText = '🧺10';
+                document.getElementById('storage-grid').appendChild(item);
+                currentInBasket = 0;
+                orangePile.innerHTML = '';
+                updateUI();
+            }
+        };
+
+        function calculateUser() {
+            const b = parseInt(document.getElementById('in-basket').value) || 0;
+            const c = parseInt(document.getElementById('in-capacity').value) || 0;
+            document.getElementById('user-result').innerText = b * c;
+        }
+
+        function updateUI() {
+            document.getElementById('basket-count').innerText = `${currentInBasket} / 10`;
+            basket.classList.toggle('full', currentInBasket === maxCapacity);
+            document.getElementById('sum-actual').innerText = totalHarvestedActual;
+        }
+
+        initGame();
+    </script>
+</body>
+</html>

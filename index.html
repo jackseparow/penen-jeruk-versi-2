@@ -167,4 +167,171 @@
             <div id="orchard-bg"></div>
             <div id="orange-container"></div>
             <div id="active-basket">
-                <div id="basket-orange-
+                <div id="basket-orange-pile" style="position:relative; width:100%; height:100%;"></div>
+                <span id="basket-count">0 / 10</span>
+            </div>
+        </div>
+
+        <div id="sidebar-right">
+            <div id="storage-area">
+                <b style="color: var(--primary-green); font-size: 0.9em;">🏠 Gudang Penyimpanan</b>
+                <div id="storage-grid"></div>
+                <div id="numeracy-logic">
+                    <span class="total-label">Berapa total jeruk di gudang?</span>
+                    <div class="logic-row-h">
+                        <div class="input-group">
+                            <input type="number" id="in-basket" class="logic-input" oninput="calculateUser()">
+                            <label>Keranjang</label>
+                        </div>
+                        <span style="font-weight:bold; font-size: 1.2em; color: var(--primary-green);">×</span>
+                        <div class="input-group">
+                            <input type="number" id="in-capacity" class="logic-input" oninput="calculateUser()">
+                            <label>Isi</label>
+                        </div>
+                        <span style="font-weight:bold; font-size: 1.2em; color: var(--primary-green);">=</span>
+                        <span id="user-result">0</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentInBasket = 0;
+        let totalHarvestedActual = 0;
+        const maxCapacity = 10;
+
+        const basket = document.getElementById('active-basket');
+        const simArea = document.getElementById('sim-container');
+        const orangeContainer = document.getElementById('orange-container');
+        const orangePile = document.getElementById('basket-orange-pile');
+
+        function initGame() {
+            orangeContainer.innerHTML = '';
+            orangePile.innerHTML = '';
+            currentInBasket = 0;
+            totalHarvestedActual = 0;
+            document.getElementById('storage-grid').innerHTML = '';
+            document.getElementById('in-basket').value = '';
+            document.getElementById('in-capacity').value = '';
+            document.getElementById('user-result').innerText = '0';
+            updateUI();
+
+            let spawned = 0;
+            const targetTotal = 30; // Sedikit dikurangi agar tidak terlalu sesak di layar kecil
+
+            while (spawned < targetTotal) {
+                let x = 10 + Math.random() * 80; 
+                let y = 22 + Math.random() * 40; 
+                let centerX = 50;
+                let centerY = 40;
+                
+                // Sebaran elips yang lebih luas (45 horizontal, 28 vertikal)
+                let dist = Math.sqrt(Math.pow((x - centerX) / 45, 2) + Math.pow((y - centerY) / 28, 2));
+
+                if (dist < 1) { 
+                    const orange = document.createElement('div');
+                    orange.className = 'orange';
+                    orange.style.left = x + '%';
+                    orange.style.top = y + '%';
+                    orange.style.transform = `rotate(${Math.random() * 360}deg)`;
+                    orange.onclick = function() { pickOrange(this); };
+                    orangeContainer.appendChild(orange);
+                    spawned++;
+                }
+            }
+        }
+
+        function pickOrange(el) {
+            if (currentInBasket >= maxCapacity) return;
+            const oRect = el.getBoundingClientRect();
+            const bRect = basket.getBoundingClientRect();
+
+            // Deteksi pusat horizontal jeruk vs pusat horizontal keranjang
+            // Toleransi disesuaikan agar tetap mudah di HP
+            const orangeMid = oRect.left + (oRect.width / 2);
+            const basketMid = bRect.left + (bRect.width / 2);
+
+            if (Math.abs(orangeMid - basketMid) < (bRect.width / 1.5)) {
+                el.style.transition = "top 0.4s ease-in, opacity 0.3s";
+                el.style.top = "85%";
+                el.style.opacity = "0";
+                setTimeout(() => {
+                    if(el.parentNode) el.remove();
+                    addOrangeToBasket();
+                    currentInBasket++;
+                    totalHarvestedActual++;
+                    updateUI();
+                }, 400);
+            } else {
+                // Animasi goyang jika meleset (opsional, memberi feedback)
+                el.style.transform = "translateX(5px)";
+                setTimeout(() => el.style.transform = "translateX(-5px)", 100);
+                setTimeout(() => el.style.transform = "none", 200);
+            }
+        }
+
+        function addOrangeToBasket() {
+            const p = document.createElement('div');
+            p.className = 'pile-orange';
+            const basketW = basket.offsetWidth;
+            p.style.left = (basketW * 0.2 + Math.random() * (basketW * 0.5)) + "px";
+            p.style.bottom = (5 + Math.floor(currentInBasket/3) * 10) + "px";
+            p.style.transform = `rotate(${-20 + Math.random() * 40}deg)`;
+            orangePile.appendChild(p);
+        }
+
+        function handleInput(clientX) {
+            const rect = simArea.getBoundingClientRect();
+            const basketWidth = basket.offsetWidth;
+            let x = clientX - rect.left - (basketWidth / 2);
+            
+            if (x < 0) x = 0;
+            if (x > rect.width - basketWidth) x = rect.width - basketWidth;
+            
+            basket.style.left = x + "px";
+            basket.style.transform = "none";
+        }
+
+        // Event listener untuk Mouse dan Touch
+        simArea.addEventListener('mousemove', (e) => { if(e.buttons === 1) handleInput(e.clientX); });
+        simArea.addEventListener('touchstart', (e) => { handleInput(e.touches[0].clientX); }, {passive: true});
+        simArea.addEventListener('touchmove', (e) => { 
+            handleInput(e.touches[0].clientX); 
+        }, {passive: false});
+
+        basket.onclick = (e) => {
+            if (currentInBasket === maxCapacity) {
+                const item = document.createElement('div');
+                item.className = 'stored-basket';
+                item.innerText = '🧺10';
+                document.getElementById('storage-grid').appendChild(item);
+                currentInBasket = 0;
+                orangePile.innerHTML = '';
+                basket.style.left = "50%";
+                basket.style.transform = "translateX(-50%)";
+                updateUI();
+            }
+        };
+
+        function calculateUser() {
+            const b = parseInt(document.getElementById('in-basket').value) || 0;
+            const c = parseInt(document.getElementById('in-capacity').value) || 0;
+            document.getElementById('user-result').innerText = b * c;
+        }
+
+        function updateUI() {
+            document.getElementById('basket-count').innerText = `${currentInBasket} / 10`;
+            basket.classList.toggle('full', currentInBasket === maxCapacity);
+            document.getElementById('sum-actual').innerText = totalHarvestedActual;
+        }
+
+        initGame();
+        // Cegah resize refresh yang merusak posisi
+        window.addEventListener('resize', () => {
+            basket.style.left = "50%";
+            basket.style.transform = "translateX(-50%)";
+        });
+    </script>
+</body>
+</html>
